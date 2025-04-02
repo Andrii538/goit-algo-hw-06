@@ -13,15 +13,15 @@ class Field:
 class Name(Field):
     def __init__(self, value):
         super().__init__(value)
-        
+
 
 class Phone(Field):
     def __init__(self, value: str):
         super().__init__(value)
-        if  not value.isdigit() and len(value) == 10:
+        if  not (isinstance(value, str) and value.isdigit() and len(value) == 10):
             raise ValueError
 
-        
+
 class Record:
     def __init__(self, name):
         self.name = Name(name)
@@ -30,20 +30,21 @@ class Record:
 
     def add_phone(self, phone):
         return self.phones.append(Phone(phone))
-    
+
 
     def remove_phone(self, phone):
-        if self.find_phone(phone):
-            return self.phones.remove(self.find_phone(phone))
-    
+        phone_obj = self.find_phone(phone)
+        if phone_obj:
+            return self.phones.remove(phone_obj)
+
 
     def edit_phone(self, phone, new_phone):
         if self.find_phone(phone):
-            self.remove_phone(phone)
-            return self.add_phone(new_phone)
+            self.add_phone(new_phone)
+            return self.remove_phone(phone)
         else:
             raise ValueError
-        
+
 
     def find_phone(self, phone):
         for item in self.phones:
@@ -59,22 +60,22 @@ class Record:
 class AddressBook(UserDict):
     def add_record(self, record: Record):
         self.data[record.name.value] = record
-    
+
 
     def find(self, name) -> Record:
         if name in self.data:
             return self.data[name]
-    
+
 
     def delete(self, name):
         self.data.pop(name)
         return
-    
+
 
     def __str__(self):
         return '\n'.join(f'{self.data[item]}' for item in self.data)
 
-    
+
 # Створення нової адресної книги
 book = AddressBook()
 
@@ -92,7 +93,6 @@ jane_record.add_phone("9876543210")
 book.add_record(jane_record)
 
     # Виведення всіх записів у книзі
-     
 print(book)
 
     # Знаходження та редагування телефону для John
